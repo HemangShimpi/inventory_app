@@ -75,6 +75,7 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
     );
   }
 
+  // add item function
   void _addItem() {
     TextEditingController nameController = TextEditingController();
     TextEditingController quantityController = TextEditingController();
@@ -131,6 +132,7 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
     );
   }
 
+  // edit item function
   void _editItem(QueryDocumentSnapshot doc) async {
     TextEditingController nameController = TextEditingController();
     TextEditingController quantityController = TextEditingController();
@@ -190,6 +192,7 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
     );
   }
 
+  // delete item function
   void _deleteItem(String id) {
     showDialog(
       context: context,
