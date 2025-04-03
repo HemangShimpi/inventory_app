@@ -50,7 +50,19 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
                   return ListTile(
                     title: Text(doc['name']),
                     subtitle: Text("Quantity: ${doc['quantity']}"),
-                    trailing: Row(mainAxisSize: MainAxisSize.min),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () => _editItem(doc),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () => _deleteItem(doc.id),
+                        ),
+                      ],
+                    ),
                   );
                 }).toList(),
           );
@@ -112,6 +124,92 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
                 Navigator.of(context).pop();
               },
               child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _editItem(QueryDocumentSnapshot doc) async {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController quantityController = TextEditingController();
+
+    nameController.text = doc['name'];
+    quantityController.text = doc['quantity'].toString();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit Item'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Edit item name'),
+              ),
+              TextField(
+                controller: quantityController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Edit quantity'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                if (nameController.text.isNotEmpty &&
+                    quantityController.text.isNotEmpty) {
+                  try {
+                    int quantity = int.parse(quantityController.text);
+                    await inventory.doc(doc.id).update({
+                      'name': nameController.text,
+                      'quantity': quantity,
+                    });
+                    Navigator.of(context).pop();
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Invalid quantity entered')),
+                    );
+                  }
+                }
+              },
+              child: Text('Update'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteItem(String id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Item'),
+          content: Text('Are you sure you want to delete this item?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                await inventory.doc(id).delete();
+                Navigator.of(context).pop();
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('No'),
             ),
           ],
         );
